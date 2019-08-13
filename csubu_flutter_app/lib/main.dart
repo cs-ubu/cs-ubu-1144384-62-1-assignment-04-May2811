@@ -1,20 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugDefaultTargetPlatformOverride;
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
-
   debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
 
   runApp(new CSUBUFlutterApp());
-
 }
 
 class CSUBUFlutterApp extends StatelessWidget {
-
   final appTitle = 'CSUBU App Page';
 
   @override
@@ -28,54 +26,60 @@ class CSUBUFlutterApp extends StatelessWidget {
       home: AppHomePage(title: appTitle),
     );
   }
-
 }
 
 class AppHomePage extends StatefulWidget {
-
   AppHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
   _AppHomePageState createState() => _AppHomePageState();
-
 }
 
 class _AppHomePageState extends State<AppHomePage> {
-
   int _counter = 0;
-  var _courses = <dynamic>[ ];
+  var _courses = <dynamic>[];
   // Future<dynamic> _students;
   var _students = [];
   var _loading = true;
   var _page = 0;
 
   _getStudents() async {
-    var url = 'http://cs.sci.ubu.ac.th:7512/topic-1/Jutamas_59110440101/_search?from=${_page*10}&size=10';
-    const headers = { 'Content-Type': 'application/json; charset=utf-8' };
-    const query = { 'query': { 'match_all': {} } };
-    final response = await http.post(url, headers: headers, body: json.encode(query));
+    var url =
+        'http://cs.sci.ubu.ac.th:7512/topic-1/Jutamas_59110440101/_search?from=${_page * 10}&size=10';
+    const headers = {'Content-Type': 'application/json; charset=utf-8'};
+    const query = {
+      'query': {'match_all': {}}
+    };
+    final response =
+        await http.post(url, headers: headers, body: json.encode(query));
     _students = [];
     if (response.statusCode == 200) {
-      var result = jsonDecode(utf8.decode(response.bodyBytes))['result']['hits'];
+      var result =
+          jsonDecode(utf8.decode(response.bodyBytes))['result']['hits'];
       result.forEach((item) {
         if (item.containsKey('_source')) {
           var source = item['_source'];
-          if (source.containsKey('detial') && source.containsKey('price')&& source.containsKey('image')) {
+          if (source.containsKey('detial') &&
+              source.containsKey('price') &&
+              source.containsKey('may') &&
+              source.containsKey('image')) {
             _students.add(item['_source']);
           }
         }
       });
     }
     setState(() {
-      _page = (_page+1)%3;
+      _page = (_page + 1) % 3;
       _loading = false;
     });
   }
 
   void _incrementCounter() {
-    setState(() { _loading = true; });
+    setState(() {
+      _loading = true;
+    });
     _getStudents();
   }
 
@@ -87,48 +91,73 @@ class _AppHomePageState extends State<AppHomePage> {
         itemBuilder: (context, i) {
           final student = _students[i];
           var sum = 0;
-          student['detial'].runes.forEach((c) { sum += c; });
+          student['detial'].runes.forEach((c) {
+            sum += c;
+          });
           return ListTile(
-            title: Row(
+              title: Row(children: <Widget>[
+                // Image.asset('assets/images/csubu-bw.png', width: 48, height: 48),
+                CircleAvatar(
+                    backgroundImage: NetworkImage('${student["image"]}')),
+                   Expanded(child: Text(student["may"]))
+              ]),
+              subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    // Image.asset('assets/images/csubu-bw.png', width: 48, height: 48),
-                    CircleAvatar(backgroundImage: NetworkImage('${student["image"]}')),
-                    Expanded(child: Text(student["detial"]))
-                  ]
-                ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text('detial: ${student["detial"]}'),
-                Text('price: ${student["price"]}')
-              ]
-             )
-          );
-        }
-      );
+                    Text('detial: ${student["detial"]}'),
+                    Text('price: ${student["price"]}'),
+                    
+                    Divider(),
+                    ListTile(
+                      title: Text('(408) 555-1212',
+                          style: TextStyle(fontWeight: FontWeight.w500)),
+                      leading: Icon(
+                        Icons.contact_phone,
+                        color: Colors.blue[500],
+                      ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.star, color: Colors.green[500]),
+                        Icon(Icons.star, color: Colors.green[500]),
+                        Icon(Icons.star, color: Colors.green[500]),
+                        Icon(Icons.star, color: Colors.black),
+                        Icon(Icons.star, color: Colors.black),
+                        Icon(Icons.share,color: Colors.blue[500]),
+
+                      ],
+                    )
+                  ]));
+        });
   }
 
   Widget loadingWidget(BuildContext context) {
-    return Column(children: <Widget>[Text('loading....'), CircularProgressIndicator(), Text('Click the button')]);
+    return Column(children: <Widget>[
+      Text('loading....'),
+      CircularProgressIndicator(),
+      Text('Click the button')
+    ]);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: (_loading)? loadingWidget(context) : studentWidgets(context),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Container(height: 50.0,),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Text('$_page'), // Icon(Icons.add),
-      )
-    );
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Center(
+          child: (_loading) ? loadingWidget(context) : studentWidgets(context),
+        ),
+        bottomNavigationBar: BottomAppBar(
+          child: Container(
+            height: 50.0,
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _incrementCounter,
+          tooltip: 'Increment',
+          child: Text('$_page'), // Icon(Icons.add),
+        ));
   }
 }
