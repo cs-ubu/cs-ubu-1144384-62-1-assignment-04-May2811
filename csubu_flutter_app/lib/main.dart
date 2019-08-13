@@ -13,7 +13,7 @@ void main() {
 }
 
 class CSUBUFlutterApp extends StatelessWidget {
-  final appTitle = 'แอพพลิเคชั่นร้านขายชุดว่ายน้ำหญิง';
+  final appTitle = 'ร้านขายชุดว่ายน้ำหญิง';
 
   @override
   Widget build(BuildContext context) {
