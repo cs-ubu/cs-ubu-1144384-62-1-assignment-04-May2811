@@ -13,14 +13,14 @@ void main() {
 }
 
 class CSUBUFlutterApp extends StatelessWidget {
-  final appTitle = 'CSUBU App Page';
+  final appTitle = 'แอพพลิเคชั่นร้ายขายชุดว่ายน้ำหญิง';
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: appTitle,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.pink,
         //fontFamily: 'Roboto'
       ),
       home: AppHomePage(title: appTitle),
